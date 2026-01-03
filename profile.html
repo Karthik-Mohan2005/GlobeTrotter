@@ -1,0 +1,59 @@
+<!-- ================= PAGE 1: VIEW PROFILE ================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.png">
+    <title>User Profile</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+        body {
+            margin: 0; min-height: 100vh; display: flex;
+            justify-content: center; align-items: center;
+            background:url(realistic-travel-background-with-elements_52683-77784.avif);
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+        .container {
+            background: #c3e0ec; padding: 30px; width: 100%; max-width: 420px;
+            border-radius: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; }
+        h2 { margin-bottom: 10px; }
+        p { margin: 6px 0; color: #555; }
+        button {
+            margin-top: 20px; padding: 12px; width: 100%;
+            border: none; border-radius: 8px;
+            background: #4facfe; color: white; font-size: 16px; cursor: pointer;
+        }
+        button:hover { background: #539de7; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img id="profilePhoto" src="logo.png" alt="Profile Photo">
+    <h2 id="profileName">User Name</h2>
+    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+    <p><strong>Language:</strong> <span id="profileLanguage"></span></p>
+    <button onclick="location.href='updatepro.html'">Update Profile</button>
+	<button onclick="location.href='dash.html'">Home</button>
+</div>
+
+<script>
+    const profile = JSON.parse(localStorage.getItem("profile"));
+    if (profile) {
+        document.getElementById("profileName").innerText = profile.name;
+        document.getElementById("profileEmail").innerText = profile.email;
+        document.getElementById("profileLanguage").innerText = profile.language;
+        if (profile.photo) document.getElementById("profilePhoto").src = profile.photo;
+    } else {
+        document.getElementById("profileName").innerText = "Guest User";
+        document.getElementById("profileEmail").innerText = "Not set";
+        document.getElementById("profileLanguage").innerText = "English";
+    }
+</script>
+</body>
+</html>

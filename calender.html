@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Trip Planner Calendar</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="logo.png">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* FORM */
+  .form {
+    max-width: 500px;
+    margin: auto;
+    background: #020617;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+  }
+
+  input, button {
+    width: 96%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: none;
+  }
+
+  button {
+    background: #2563eb;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* CALENDAR */
+  .calendar {
+    max-width: 900px;
+    margin: auto;
+    background: #020617;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .month {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+  }
+
+  .day-name {
+    text-align: center;
+    font-weight: bold;
+    color: #94a3b8;
+  }
+
+  .day {
+    min-height: 90px;
+    padding: 6px;
+    background: #1e293b;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  .date-number {
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .trip-name {
+    display: block;
+    font-size: 11px;
+    margin-top: 4px;
+    padding: 3px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+  }
+
+  /* MODAL */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+
+  .modal-content {
+    background: #020617;
+    padding: 20px;
+    border-radius: 10px;
+    width: 320px;
+  }
+
+  .modal-content h3 {
+    margin-bottom: 10px;
+  }
+
+  .modal-content button {
+    margin-top: 15px;
+    background: #2563eb;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>📅 Trip Planner Calendar</h1>
+
+<div class="form">
+  <input type="text" id="tripName" placeholder="Trip Name">
+  <input type="date" id="startDate">
+  <input type="date" id="endDate">
+  <button onclick="planTrip()">Plan Trip</button>
+</div>
+
+<div class="calendar">
+  <div class="month" id="monthYear"></div>
+  <div class="grid" id="calendar"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="tripModal">
+  <div class="modal-content">
+    <h3 id="modalTitle"></h3>
+    <p id="modalDates"></p>
+    <button onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+  const calendarEl = document.getElementById("calendar");
+  const monthYearEl = document.getElementById("monthYear");
+
+  const colors = ["#2563eb", "#16a34a", "#dc2626", "#9333ea", "#f59e0b"];
+  let trips = [];
+
+  const today = new Date();
+
+  function renderCalendar() {
+    calendarEl.innerHTML = "";
+
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    monthYearEl.innerText =
+      today.toLocaleString("default", { month: "long" }) + " " + year;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    days.forEach(d => {
+      const div = document.createElement("div");
+      div.className = "day-name";
+      div.innerText = d;
+      calendarEl.appendChild(div);
+    });
+
+    for (let i = 0; i < firstDay; i++) {
+      calendarEl.appendChild(document.createElement("div"));
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const cell = document.createElement("div");
+      cell.className = "day";
+
+      const number = document.createElement("div");
+      number.className = "date-number";
+      number.innerText = day;
+      cell.appendChild(number);
+
+      trips.forEach(trip => {
+        if (date >= trip.start && date <= trip.end) {
+          const span = document.createElement("span");
+          span.className = "trip-name";
+          span.innerText = trip.name;
+          span.style.background = trip.color;
+          span.onclick = () => openModal(trip);
+          cell.appendChild(span);
+        }
+      });
+
+      calendarEl.appendChild(cell);
+    }
+  }
+
+  function planTrip() {
+    const name = document.getElementById("tripName").value;
+    const start = new Date(document.getElementById("startDate").value);
+    const end = new Date(document.getElementById("endDate").value);
+
+    if (!name || !start || !end || start > end) {
+      alert("Please enter valid trip details");
+      return;
+    }
+
+    trips.push({
+      name,
+      start,
+      end,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+
+    document.getElementById("tripName").value = "";
+    renderCalendar();
+  }
+
+  function openModal(trip) {
+    document.getElementById("modalTitle").innerText = trip.name;
+    document.getElementById("modalDates").innerText =
+      `From ${trip.start.toDateString()} to ${trip.end.toDateString()}`;
+    document.getElementById("tripModal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("tripModal").style.display = "none";
+  }
+
+  renderCalendar();
+</script>
+
+</body>
+</html>
